@@ -6,7 +6,8 @@ import { userService } from "./user.service";
 
 const createUser = async (req: Request, res: Response) => {
 
-    const payload = req.body
+    try{
+        const payload = req.body
     console.log(payload);
 
     const user = await userService.createUserInDB(payload)
@@ -21,6 +22,16 @@ const createUser = async (req: Request, res: Response) => {
             user
         }
     })
+    }
+    catch(error){
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            success:false,
+            successCode:httpStatus.INTERNAL_SERVER_ERROR,
+            message:"Failed to register user !",
+            error: (error as Error).message
+
+        })
+    }
 
 
 
