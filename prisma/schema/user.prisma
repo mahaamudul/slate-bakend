@@ -5,7 +5,7 @@ model User {
     password String
     activeStatus ActiveStatus @default(ACTIVE)
 
-    user Role @default(USER)
+    role Role @default(USER)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     profile Profile?

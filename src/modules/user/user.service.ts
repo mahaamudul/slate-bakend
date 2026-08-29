@@ -25,19 +25,16 @@ const createUserInDB=async(payload:CreateUserPayload)=>{
         data:{
             name,
             email,
-            password:hashedPassword
+            password:hashedPassword,
+            profile:{
+                create:{
+                    profilePhoto
+                }//create user profile while create user
+            }
         }
 
     });
 
-    await prisma.profile.create({
-        data:{
-            userId:createdUser.id,
-            profilePhoto
-
-
-        }
-    })
 
 
     const user = await prisma.user.findUnique({
