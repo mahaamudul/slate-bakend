@@ -9,6 +9,8 @@ import { prisma } from "./lib/prisma";
 import bcrypt from "bcryptjs";
 import { userRoutes } from "./modules/user/user.route";
 import { authRoutes } from "./modules/auth/auth.route";
+import { postRoutes } from "./modules/post/post.route";
+import { commentRoutes } from "./modules/comment/comment.route";
 
 const app:Application=express()
 
@@ -34,6 +36,13 @@ app.use('/api/users',userRoutes);
 
 //login users
 app.use('/api/auth',authRoutes)
+
+//redirect to post route 
+app.use('/api/posts',postRoutes)
+
+// redirect to the comments route 
+app.use('/api/comments',commentRoutes)
+
 
 
 
