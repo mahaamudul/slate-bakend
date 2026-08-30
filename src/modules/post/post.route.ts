@@ -17,7 +17,7 @@ router.post('/',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.createPost
 router.get('/stats',postController.getStats )
 
 // my pots 
-router.get('/my-posts',postController.getMyPosts )
+router.get('/my-posts',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.getMyPosts )
 
 // single post 
 router.get('/:postId',postController.getSinglePost )

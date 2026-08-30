@@ -68,35 +68,42 @@ const getStats = catchAsync(async (req: Request, res: Response, next: NextFuncti
 const getMyPosts = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     
 
+    const userId=req.user?.id
 
+    const result=await postService.getMyPostsFromDB(userId as string)
     
 
 
     sendResponse(res,{
         success: true,
         statusCode: httpStatus.CREATED,
-        message: "from my posts   ",
+        message: "My all posts retrieve successfully",
         data: {
-            
+            result
         }
     })
 
 })
 
-// get single post 
+// get single post // DONE
 const getSinglePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    
 
+    const postId=req.params.postId
 
     
+    const result=await postService.getSinglePostFromDB(postId as string)
+
+    if(!postId){
+        throw new Error("Post id is required in params")
+    }
 
 
     sendResponse(res,{
         success: true,
-        statusCode: httpStatus.CREATED,
-        message: "from single  post ",
+        statusCode: httpStatus.OK,
+        message: "Post retrieve successfully",
         data: {
-            
+            result
         }
     })
 

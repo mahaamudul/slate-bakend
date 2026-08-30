@@ -20,7 +20,7 @@ const getAllPostsFromDB=async()=>{
 
 }
 
-// create a post in db DONE 
+// create a post in db // DONE 
 const createNewPostInDB=async(payload:ICreatePostPayload,userId:string)=>{
 
     const result= await prisma.post.create({
@@ -42,13 +42,65 @@ const getPostStatsFromDB=async()=>{
 }
 
 // get my post from db 
-const getMyPostsFromDB=async()=>{
+const getMyPostsFromDB=async(authorId:string)=>{
+    const post=await prisma.post.findMany({
+        where:{
+            authorId
+        },
+        orderBy:{
+            createdAt:"desc"
+        },
+        include:{
+            comments:true,
+            author:{
+                omit:{
+                    password:true,
+                    email:true
+                }
+            },
+            _count:{
+                select:{
+                    comments:true
+                }
+            }
+        },
+        
+    })
 
+    return post
 
 }
 
-// get single post by id from db 
-const getSinglePostFrom=async()=>{
+// get single post by id from db // DONE
+const getSinglePostFromDB=async(postId:string)=>{
+
+    // const post=await prisma.post.findFirstOrThrow({
+    //     where:{
+    //         id:postId
+    //     }
+    // })
+
+    const updatedPost=await prisma.post.update({
+        where:{
+            id:postId
+        },
+        data:{
+            views:{
+                increment:1
+            }
+        },
+        include:{
+            author:{
+                omit:{
+                    password:true,
+                    email:true
+                }
+            }
+        }
+
+    })
+
+    return updatedPost
 
 
 }
@@ -71,7 +123,7 @@ export const postService = {
         getAllPostsFromDB,
         getPostStatsFromDB,
         getMyPostsFromDB,
-        getSinglePostFrom,
+        getSinglePostFromDB,
         createNewPostInDB,
         updatePostInDB,
         deletePostFrom
