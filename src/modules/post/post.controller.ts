@@ -45,26 +45,8 @@ const createPost  = catchAsync(async (req: Request, res: Response, next: NextFun
 
 })
 
-// get stats 
-const getStats = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    
 
-
-    
-
-
-    sendResponse(res,{
-        success: true,
-        statusCode: httpStatus.CREATED,
-        message: "from stats  ",
-        data: {
-            
-        }
-    })
-
-})
-
-// get my posts 
+// get my posts //DONE
 const getMyPosts = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     
 
@@ -109,8 +91,16 @@ const getSinglePost = catchAsync(async (req: Request, res: Response, next: NextF
 
 })
 
-//update post 
+//update post // DONE
 const updatePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+
+    const authorId=req.user?.id
+    const isAdmin=req.user?.role==='ADMIN'
+    const payload= req.body
+    const postId=req.params.postId 
+
+    const result=await postService.updatePostInDB(postId as string,payload,authorId as string,isAdmin)
     
 
 
@@ -120,16 +110,39 @@ const updatePost = catchAsync(async (req: Request, res: Response, next: NextFunc
     sendResponse(res,{
         success: true,
         statusCode: httpStatus.CREATED,
-        message: "from update post",
+        message: "Post updated successfully",
         data: {
-            
+            result
         }
     })
 
 })
 
-// delete post 
+// delete post //Done
 const deletePost = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    
+
+    const authorId=req.user?.id
+    const isAdmin=req.user?.role==='ADMIN'
+    const postId=req.params.postId 
+
+    
+    
+    const result =await postService.deletePostFrom(postId as string,authorId as string,isAdmin)
+
+    sendResponse(res,{
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Post deleted successfully !",
+        data: {
+            result
+        }
+    })
+
+})
+
+// get stats 
+const getStats = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     
 
 
@@ -139,7 +152,7 @@ const deletePost = catchAsync(async (req: Request, res: Response, next: NextFunc
     sendResponse(res,{
         success: true,
         statusCode: httpStatus.CREATED,
-        message: "from delete post",
+        message: "from stats  ",
         data: {
             
         }

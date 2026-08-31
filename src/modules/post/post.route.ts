@@ -13,8 +13,6 @@ router.get('/',postController.getAllPosts )
 // create a new post 
 router.post('/',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.createPost )
 
-// post stats 
-router.get('/stats',postController.getStats )
 
 // my pots 
 router.get('/my-posts',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.getMyPosts )
@@ -23,10 +21,13 @@ router.get('/my-posts',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.get
 router.get('/:postId',postController.getSinglePost )
 
 // update post 
-router.patch('/:postId',postController.updatePost )
+router.patch('/:postId',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.updatePost )
 
 // delete post 
-router.delete('/:postId',postController.deletePost )
+router.delete('/:postId',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.deletePost )
+
+// post stats 
+router.get('/stats',postController.getStats )
 
 
 
