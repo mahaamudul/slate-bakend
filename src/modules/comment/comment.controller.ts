@@ -2,22 +2,24 @@ import { NextFunction, Request, Response } from "express";
 import { sendResponse } from "../../utils/sendResponse";
 import { catchAsync } from "../../utils/catchAsync";
 import httpStatus from 'http-status'
+import { commentService } from "./comment.service";
 
 
-// create comment 
+// create comment // DONE
 const createComment = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
 
+    const authorId=req.user?.id
+    const payload=req.body
 
-
-
+    const result=await commentService.createCommentInDB(authorId as string,payload)
 
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
-        message: "create comment ",
+        message: "Comment created successfully",
         data: {
-
+            result
         }
     })
 
@@ -26,7 +28,9 @@ const createComment = catchAsync(async (req: Request, res: Response, next: NextF
 // all comments by specif author
 const allCommentsByAuthor = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
+    const authorId=req.params.authorId
 
+    const result=await commentService.authorCommentFromDB(authorId as string)
 
 
 
@@ -34,9 +38,9 @@ const allCommentsByAuthor = catchAsync(async (req: Request, res: Response, next:
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
-        message: " all comments by specif author",
+        message: "Author comments retrieve successfully !",
         data: {
-
+            result
         }
     })
 

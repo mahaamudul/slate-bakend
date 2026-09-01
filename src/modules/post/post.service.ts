@@ -1,5 +1,5 @@
 import { count } from "node:console"
-import { CommentStatus } from "../../../generated/prisma/enums"
+import { CommentStatus, PostStatus } from "../../../generated/prisma/enums"
 import { prisma } from "../../lib/prisma"
 import { ICreatePostPayload, IUpdatePostPayload } from "./post.interface"
 
@@ -233,7 +233,85 @@ const deletePostFrom = async (postId: string, authorId: string, isAdmin: boolean
 
 // get post stats from db 
 const getPostStatsFromDB = async () => {
+    
 
+    const transactionResult= await prisma.$transaction(
+
+    
+        async(tx)=>{
+
+            const [
+                totalPosts,
+                totalPublishedPosts,
+                totalArchivedPosts,
+                totalDraftPosts,
+                totalViewSum,
+                totalComments,
+                totalApprovedComment,
+                totalRejectComment
+
+            ]=await Promise.all([
+
+            await tx.post.count(),
+
+            await tx.post.count({
+                where:{
+                    status:PostStatus.PUBLISHED
+                }
+            }),
+            await tx.post.count({
+                where:{
+                    status:PostStatus.DRAFT
+                }
+            }),
+            await tx.post.count({
+                where:{
+                    status:PostStatus.ARCHIVED
+                }
+            }),
+
+            await tx.post.aggregate({
+                _sum:{
+                    views:true
+                }
+            }),
+
+            
+
+
+            await tx.comment.count(),
+
+            await tx.comment.count({
+                where:{
+                    status:CommentStatus.APPROVED
+                }
+            }),
+
+            await tx.comment.count({
+                where:{
+                    status:CommentStatus.REJECT
+                }
+            })
+
+            ])
+
+            
+
+            return {
+                totalPosts,
+                totalPublishedPosts,
+                totalArchivedPosts,
+                totalDraftPosts,
+                totalView: totalViewSum._sum.views,
+                totalComments,
+                totalApprovedComment,
+                totalRejectComment
+            }
+
+        }
+    )
+
+    return transactionResult
 
 }
 

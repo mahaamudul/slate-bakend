@@ -1,11 +1,50 @@
-// create comment 
-const createCommentInDB=async()=>{
+import { prisma } from "../../lib/prisma"
+import { ICommentInterface } from "./comment.interface"
+
+// create comment // DONE
+const createCommentInDB=async(authorId:string,payload:ICommentInterface)=>{
+
+    await prisma.post.findUniqueOrThrow({
+        where:{
+            id:payload.postId
+        }
+    })
+
+    const newComment=await prisma.comment.create({
+        data:{
+            ...payload,
+            authorId
+        }
+    })
+
+    return newComment
 
 }
 
 
-// get all posts from db
-const authorCommentFromDB=async()=>{
+// get author comment // DONE
+const authorCommentFromDB=async(authorId:string)=>{
+
+    await prisma.user.findFirstOrThrow({
+        where:{
+            id:authorId
+        }
+    })
+
+    const comments = await prisma.comment.findMany({
+        where: {
+            authorId
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+        include: {
+            
+           post:true
+        },
+
+    })
+    return comments
 
 }
 

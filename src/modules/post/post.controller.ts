@@ -141,20 +141,17 @@ const deletePost = catchAsync(async (req: Request, res: Response, next: NextFunc
 
 })
 
-// get stats 
+// get post stats 
 const getStats = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    
 
-
-    
-
+    const result=await postService.getPostStatsFromDB()
 
     sendResponse(res,{
         success: true,
-        statusCode: httpStatus.CREATED,
-        message: "from stats  ",
+        statusCode: httpStatus.OK,
+        message: "Post Stats ",
         data: {
-            
+            result
         }
     })
 

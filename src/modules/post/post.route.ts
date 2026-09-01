@@ -17,6 +17,9 @@ router.post('/',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.createPost
 // my pots 
 router.get('/my-posts',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.getMyPosts )
 
+// post stats 
+router.get('/stats',postController.getStats )
+
 // single post 
 router.get('/:postId',postController.getSinglePost )
 
@@ -25,11 +28,5 @@ router.patch('/:postId',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.up
 
 // delete post 
 router.delete('/:postId',auth(Role.ADMIN,Role.AUTHOR,Role.USER),postController.deletePost )
-
-// post stats 
-router.get('/stats',postController.getStats )
-
-
-
 
 export const postRoutes = router
