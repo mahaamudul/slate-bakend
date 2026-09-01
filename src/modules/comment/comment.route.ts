@@ -15,14 +15,14 @@ router.get('/author/:authorId',commentController.allCommentsByAuthor)
 // see  a single comment //DONE
 router.get('/:commentId',commentController.getSingleComment)
 
-// update post comment 
-router.patch('/:commentId',commentController.updateComment)
+// update post comment // DONE
+router.patch('/:commentId',auth(Role.ADMIN,Role.AUTHOR,Role.USER),commentController.updateComment)
 
 // delete comment 
-router.delete('/:commentId',commentController.deleteComment)
+router.delete('/:commentId',auth(Role.ADMIN,Role.AUTHOR,Role.USER),commentController.deleteComment)
 
 // update comment stats 
-router.patch('/:commentId/moderate',commentController.updateCommentStats)
+router.put('/:commentId/moderate',commentController.updateCommentStatus)
 
 
 

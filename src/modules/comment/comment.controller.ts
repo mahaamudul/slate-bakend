@@ -67,9 +67,14 @@ const getSingleComment = catchAsync(async (req: Request, res: Response, next: Ne
 
 })
 
-// update comment 
+// update comment // Done
 const updateComment = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
+    const userId=req.user?.id
+    const commentId=req.params.commentId
+    const payload=req.body
+
+    const result=await commentService.updateCommentInDB(userId as string,commentId as string,payload)
 
 
 
@@ -77,48 +82,52 @@ const updateComment = catchAsync(async (req: Request, res: Response, next: NextF
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED,
-        message: "update comment ",
+        statusCode: httpStatus.OK,
+        message: "Comment updated successfully ! ",
         data: {
-
+            result
         }
     })
 
 })
 
-// delete comment 
+// delete comment // DONE
 const deleteComment = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
 
+    const userId=req.user?.id
+    const commentId=req.params.commentId
 
-
-
+    const result=await commentService.deleteCommentFromDB(userId as string,commentId as string)
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED,
-        message: "delete comment  ",
+        statusCode: httpStatus.OK,
+        message: "Comment deleted successfully",
         data: {
-
+            result
         }
     })
 
 })
 
-// update comment stats 
-const updateCommentStats = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+// update comment status 
+const updateCommentStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
 
+    const commentId = req.params.commentId
+    const payload=req.body
 
+    const result=await commentService.updateCommentStatusInDB(commentId as string,payload)
+  
 
 
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
-        message: "update comment stats  ",
-        data: {
-
-        }
+        message: `Status updated to ${payload.status}`,
+        data: {result}
+            
     })
 
 })
@@ -132,7 +141,7 @@ export const commentController = {
     createComment,
     updateComment,
     deleteComment,
-    updateCommentStats
+    updateCommentStatus
 
 
 }
