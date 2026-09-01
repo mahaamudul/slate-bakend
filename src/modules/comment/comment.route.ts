@@ -6,13 +6,13 @@ import { Role } from "../../../generated/prisma/enums"
 
 const router = Router()
 
-// create comment
+// create comment // DONE
 router.post('/',auth(Role.ADMIN,Role.AUTHOR,Role.USER),commentController.createComment)
 
-//see all comments by author
+//see all comments by author //DONE
 router.get('/author/:authorId',commentController.allCommentsByAuthor)
 
-// see  a single comment 
+// see  a single comment //DONE
 router.get('/:commentId',commentController.getSingleComment)
 
 // update post comment 

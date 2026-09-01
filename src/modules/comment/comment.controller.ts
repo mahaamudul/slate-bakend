@@ -25,7 +25,7 @@ const createComment = catchAsync(async (req: Request, res: Response, next: NextF
 
 })
 
-// all comments by specif author
+// all comments by specif author //DONE
 const allCommentsByAuthor = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
     const authorId=req.params.authorId
@@ -46,20 +46,22 @@ const allCommentsByAuthor = catchAsync(async (req: Request, res: Response, next:
 
 })
 
-// get single comment 
+// get single comment // DONE
 const getSingleComment = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
+    const commentId=req.params.commentId
 
+    const result=await commentService.singleCommentFromDB(commentId as string)
 
 
 
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED,
-        message: "single comment",
+        statusCode: httpStatus.OK,
+        message: "Comment found successfully",
         data: {
-
+            result
         }
     })
 

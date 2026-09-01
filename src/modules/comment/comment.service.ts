@@ -49,7 +49,18 @@ const authorCommentFromDB=async(authorId:string)=>{
 }
 
 // get single  comment from db 
-const singleCommentFromDB=async()=>{
+const singleCommentFromDB=async(commentID:string)=>{
+
+    const comment=await prisma.comment.findFirstOrThrow({
+        where:{
+            id:commentID
+        },
+        include:{
+            post:true
+        }
+    })
+
+    return comment
 
 }
 
