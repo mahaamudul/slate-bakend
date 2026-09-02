@@ -2,11 +2,56 @@ import { count } from "node:console"
 import { CommentStatus, PostStatus } from "../../../generated/prisma/enums"
 import { prisma } from "../../lib/prisma"
 import { ICreatePostPayload, IPostQuery, IUpdatePostPayload } from "./post.interface"
+import { title } from "node:process"
 
 // get all posts from db // DONE
-const getAllPostsFromDB = async (query:IPostQuery) => {
+const getAllPostsFromDB = async (query: IPostQuery) => {
+    const limit=query.limit?Number(query.limit):5
+    const page=query.page?Number(query.page):1
+
+    const skip=(page-1)*limit
+
+    const sortBy=query.sortBy? query.sortBy: "createdAt"
+
+    const sortOrder=query.sortOrder? query.sortOrder:"desc"
 
     const result = await prisma.post.findMany({
+
+        where: {
+            AND: [
+
+                query.searchTerm ? {
+                    OR: [
+                        {
+                            title: {
+                                contains: query.searchTerm,
+                                mode: "insensitive"
+                            }
+                            
+                        },
+                        {
+                            content: {
+                                contains: query.searchTerm,
+                                mode: "insensitive"
+                            }
+                            
+                        }
+                    ]
+                } : {},
+
+                query.title ? { title: query.title } : {},
+
+                query.content ? { content: query.content } : {},
+
+            ]
+        },
+
+        take:limit,
+        skip:skip,
+
+        orderBy:{
+            [sortBy]:sortOrder
+        },
         include: {
             author: {
                 omit: {
@@ -233,12 +278,12 @@ const deletePostFrom = async (postId: string, authorId: string, isAdmin: boolean
 
 // get post stats from db 
 const getPostStatsFromDB = async () => {
-    
 
-    const transactionResult= await prisma.$transaction(
 
-    
-        async(tx)=>{
+    const transactionResult = await prisma.$transaction(
+
+
+        async (tx) => {
 
             const [
                 totalPosts,
@@ -250,52 +295,52 @@ const getPostStatsFromDB = async () => {
                 totalApprovedComment,
                 totalRejectComment
 
-            ]=await Promise.all([
+            ] = await Promise.all([
 
-            await tx.post.count(),
+                await tx.post.count(),
 
-            await tx.post.count({
-                where:{
-                    status:PostStatus.PUBLISHED
-                }
-            }),
-            await tx.post.count({
-                where:{
-                    status:PostStatus.DRAFT
-                }
-            }),
-            await tx.post.count({
-                where:{
-                    status:PostStatus.ARCHIVED
-                }
-            }),
+                await tx.post.count({
+                    where: {
+                        status: PostStatus.PUBLISHED
+                    }
+                }),
+                await tx.post.count({
+                    where: {
+                        status: PostStatus.DRAFT
+                    }
+                }),
+                await tx.post.count({
+                    where: {
+                        status: PostStatus.ARCHIVED
+                    }
+                }),
 
-            await tx.post.aggregate({
-                _sum:{
-                    views:true
-                }
-            }),
-
-            
+                await tx.post.aggregate({
+                    _sum: {
+                        views: true
+                    }
+                }),
 
 
-            await tx.comment.count(),
 
-            await tx.comment.count({
-                where:{
-                    status:CommentStatus.APPROVED
-                }
-            }),
 
-            await tx.comment.count({
-                where:{
-                    status:CommentStatus.REJECT
-                }
-            })
+                await tx.comment.count(),
+
+                await tx.comment.count({
+                    where: {
+                        status: CommentStatus.APPROVED
+                    }
+                }),
+
+                await tx.comment.count({
+                    where: {
+                        status: CommentStatus.REJECT
+                    }
+                })
 
             ])
 
-            
+
 
             return {
                 totalPosts,

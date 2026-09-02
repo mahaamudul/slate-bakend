@@ -26,4 +26,5 @@ export interface IPostQuery extends PostWhereInput{
     sortBy?:string
     sortOrder?:string
     searchTerm?:string
+    limit?:string
 }
