@@ -7,8 +7,10 @@ import { postService } from "./post.service";
 
 // get all posts 
 const getAllPosts = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const query=req.query
     
-    const result=await postService.getAllPostsFromDB()
+    
+    const result=await postService.getAllPostsFromDB(query)
 
     
 

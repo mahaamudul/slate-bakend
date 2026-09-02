@@ -1,10 +1,10 @@
 import { count } from "node:console"
 import { CommentStatus, PostStatus } from "../../../generated/prisma/enums"
 import { prisma } from "../../lib/prisma"
-import { ICreatePostPayload, IUpdatePostPayload } from "./post.interface"
+import { ICreatePostPayload, IPostQuery, IUpdatePostPayload } from "./post.interface"
 
 // get all posts from db // DONE
-const getAllPostsFromDB = async () => {
+const getAllPostsFromDB = async (query:IPostQuery) => {
 
     const result = await prisma.post.findMany({
         include: {
