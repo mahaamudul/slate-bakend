@@ -15,9 +15,9 @@ const createUserInDB=async(payload:CreateUserPayload)=>{
         where:{email}
     })
 
-    if(isUserExist){
-        throw new Error("User with this email already exist !")
-    }
+    // if(isUserExist){
+    //     throw new Error("User with this email already exist !")
+    // }
 
     const hashedPassword=await bcrypt.hash(password, Number(config.bcrypt_salt_rounds))
 

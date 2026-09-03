@@ -1,16 +1,16 @@
 
-import express,{ Application, Request, Response } from "express";
+import express,{ Application, NextFunction, Request, Response } from "express";
 import cors from 'cors'
 import config from "./config";
 import cookieParser from "cookie-parser";
-import httpStatus from "http-status"
-import { prisma } from "./lib/prisma";
 
-import bcrypt from "bcryptjs";
+
 import { userRoutes } from "./modules/user/user.route";
 import { authRoutes } from "./modules/auth/auth.route";
 import { postRoutes } from "./modules/post/post.route";
 import { commentRoutes } from "./modules/comment/comment.route";
+import { notFound } from "./middleware/notFound";
+import { globalErrorHandler } from "./middleware/globalErrorHandler";
 
 const app:Application=express()
 
@@ -43,8 +43,10 @@ app.use('/api/posts',postRoutes)
 // redirect to the comments route 
 app.use('/api/comments',commentRoutes)
 
+// route not found 
+app.use(notFound)
 
-
-
+// global error 
+app.use(globalErrorHandler)
 
 export default app

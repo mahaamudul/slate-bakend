@@ -1,4 +1,4 @@
-import { count } from "node:console"
+import { count, error } from "node:console"
 import { CommentStatus, PostStatus } from "../../../generated/prisma/enums"
 import { prisma } from "../../lib/prisma"
 import { ICreatePostPayload, IPostQuery, IUpdatePostPayload } from "./post.interface"
@@ -222,11 +222,15 @@ const getSinglePostFromDB = async (postId: string) => {
 
 // update post in db //DONE
 const updatePostInDB = async (postId: string, payload: IUpdatePostPayload, authorId: string, isAdmin: boolean) => {
-    const post = await prisma.post.findFirstOrThrow({
+    const post = await prisma.post.findUnique({
         where: {
             id: postId
         }
     })
+    if(!post){
+        throw new Error("Post not found !")
+    }
+    
 
     if (!isAdmin && authorId !== post.authorId) {
         throw new Error("You are not author of this post ")
