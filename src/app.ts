@@ -11,13 +11,23 @@ import { postRoutes } from "./modules/post/post.route";
 import { commentRoutes } from "./modules/comment/comment.route";
 import { notFound } from "./middleware/notFound";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
+import { subscriptionRoutes } from "./modules/subscription/subscription.route";
 
 const app:Application=express()
 
-app.use(cors({
-    origin:config.app_url,
-    credentials:true
-}))
+app.use(
+    cors({
+        origin: config.app_url,
+        credentials: true
+    }),
+    (req, res, next) => {
+        next()
+    }
+)
+
+
+// stripe webhook
+app.use("/api/subscription/webhook",express.raw({type:'application/json'}))
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -42,6 +52,9 @@ app.use('/api/posts',postRoutes)
 
 // redirect to the comments route 
 app.use('/api/comments',commentRoutes)
+
+// redirect to checkout
+app.use('/api/subscription',subscriptionRoutes)
 
 // route not found 
 app.use(notFound)

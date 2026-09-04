@@ -1,0 +1,17 @@
+import { Router } from "express"
+import { subscriptionController } from "./subscription.controller"
+import { auth } from "../../middleware/auth"
+import { Role } from "../../../generated/prisma/enums"
+
+const router = Router()
+
+
+
+//checkout
+router.post('/checkout',auth(Role.ADMIN,Role.USER,Role.AUTHOR),subscriptionController.createCheckout )
+
+// handle webhook route
+router.post('/webhook',subscriptionController.handleWebhook)
+
+
+export const subscriptionRoutes = router
