@@ -12,6 +12,7 @@ import { commentRoutes } from "./modules/comment/comment.route";
 import { notFound } from "./middleware/notFound";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { subscriptionRoutes } from "./modules/subscription/subscription.route";
+import { premiumRoutes } from "./modules/premium/premium.route";
 
 const app:Application=express()
 
@@ -55,6 +56,9 @@ app.use('/api/comments',commentRoutes)
 
 // redirect to checkout
 app.use('/api/subscription',subscriptionRoutes)
+
+// redirect to premium content 
+app.use('/api/premium',premiumRoutes)
 
 // route not found 
 app.use(notFound)

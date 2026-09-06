@@ -8,6 +8,7 @@ export interface ICreatePostPayload{
     isFeatured:boolean;
     status?: PostStatus;
     tags:string[];
+    isPremium:boolean
 
 }
 

@@ -3,72 +3,126 @@ import { CommentStatus, PostStatus } from "../../../generated/prisma/enums"
 import { prisma } from "../../lib/prisma"
 import { ICreatePostPayload, IPostQuery, IUpdatePostPayload } from "./post.interface"
 import { title } from "node:process"
+import { Prisma } from "../../../generated/prisma/client"
 
 // get all posts from db // DONE
 const getAllPostsFromDB = async (query: IPostQuery) => {
-    const limit=query.limit?Number(query.limit):5
-    const page=query.page?Number(query.page):1
+  const limit = query.limit ? Number(query.limit) : 5;
+  const page = query.page ? Number(query.page) : 1;
+  const skip = (page - 1) * limit;
 
-    const skip=(page-1)*limit
+  const sortBy = query.sortBy || "createdAt";
+  const sortOrder = query.sortOrder || "desc";
 
-    const sortBy=query.sortBy? query.sortBy: "createdAt"
+  const andConditions: Prisma.PostWhereInput[] = [];
 
-    const sortOrder=query.sortOrder? query.sortOrder:"desc"
-
-    const result = await prisma.post.findMany({
-
-        where: {
-            AND: [
-
-                query.searchTerm ? {
-                    OR: [
-                        {
-                            title: {
-                                contains: query.searchTerm,
-                                mode: "insensitive"
-                            }
-                            
-                        },
-                        {
-                            content: {
-                                contains: query.searchTerm,
-                                mode: "insensitive"
-                            }
-                            
-                        }
-                    ]
-                } : {},
-
-                query.title ? { title: query.title } : {},
-
-                query.content ? { content: query.content } : {},
-
-            ]
+  // Search by title or content
+  if (query.searchTerm) {
+    andConditions.push({
+      OR: [
+        {
+          title: {
+            contains: query.searchTerm,
+            mode: "insensitive",
+          },
         },
-
-        take:limit,
-        skip:skip,
-
-        orderBy:{
-            [sortBy]:sortOrder
+        {
+          content: {
+            contains: query.searchTerm,
+            mode: "insensitive",
+          },
         },
-        include: {
-            author: {
-                omit: {
-                    password: true,
-                    email: true
-                }
-            },
-            comments: true
-        }
-    })
+      ],
+    });
+  }
 
-    return result
+  // Filter by title
+  if (query.title) {
+    andConditions.push({
+      title: {
+        contains: query.title as string,
+        mode: "insensitive",
+      },
+    });
+  }
 
-}
+  // Filter by content
+  if (query.content) {
+    andConditions.push({
+      content: {
+        contains: query.content as string,
+        mode: "insensitive",
+      },
+    });
+  }
+
+  // Filter: isPremium (handles string "false"/"true" or boolean)
+  const isPremiumValue =
+    query.isPremium !== undefined
+      ? typeof query.isPremium === "string"
+        ? query.isPremium === "true"
+        : Boolean(query.isPremium)
+      : false;
+
+  andConditions.push({ isPremium: isPremiumValue });
+
+  const result = await prisma.post.findMany({
+    where: {
+      AND: andConditions,
+    },
+    take: limit,
+    skip: skip,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      author: {
+        omit: {
+          password: true,
+          email: true,
+        },
+      },
+      comments: true,
+    },
+  });
+
+  const totalPostCount=await prisma.post.count({
+    where:{
+        AND:andConditions
+    }
+  })
+
+  return {
+    data:result,
+    meta:{
+        page:page,
+        limit:limit,
+        total:totalPostCount,
+        totalPage:Math.ceil(totalPostCount/limit)
+        
+    }
+  };
+};
 
 // create a post in db // DONE 
 const createNewPostInDB = async (payload: ICreatePostPayload, userId: string) => {
+
+    const user=await prisma.user.findFirstOrThrow({
+        where:{
+            id:userId
+        },
+        include:{
+            subscription:true
+        }
+    })
+
+    if(payload.isPremium ===false){
+        throw new Error("This is not premium post")
+    }
+
+    if(payload.isPremium && user.subscription?.status!=="ACTIVE"){
+        throw new Error("You need to subscribe to create premium post !")
+    }
 
     const result = await prisma.post.create({
         data: {
@@ -87,6 +141,7 @@ const getMyPostsFromDB = async (authorId: string) => {
     const post = await prisma.post.findMany({
         where: {
             authorId
+            
         },
         orderBy: {
             createdAt: "desc"
@@ -184,7 +239,8 @@ const getSinglePostFromDB = async (postId: string) => {
             // throw new Error("fake error")
             const post = await prisma.post.findFirstOrThrow({
                 where: {
-                    id: postId
+                    id: postId,
+                    isPremium:false
                 },
                 include: {
                     author: {
