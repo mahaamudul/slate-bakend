@@ -8,8 +8,9 @@
   "main": "server.ts",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "prisma generate --config prisma7.config.ts && tsc",
     "start": "node dist/server.js",
+    "migrate:deploy": "prisma migrate deploy --config prisma7.config.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "stripe:webhook":"stripe listen --forward-to localhost:5000/api/subscription/webhook"
   },

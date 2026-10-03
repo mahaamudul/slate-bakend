@@ -13,7 +13,7 @@ async function main(){
         await prisma.$connect()
         console.log("database conneted");
 
-        app.listen(PORT,()=>{
+        app.listen(PORT, "0.0.0.0",()=>{
             console.log(`server is runnig on port:${PORT}`);
         })
 
